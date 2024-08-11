@@ -17,7 +17,7 @@ class Transformer:
         return df
     
     def balance_class_amount(self, num_samples: int, df: pd.DataFrame) -> pd.DataFrame:
-        samples_by_class = [df.loc[df["class"] == label].sample(num_samples) for label in df[self.column].unique()]
+        samples_by_class = [df.loc[df[self.class_column] == label].sample(num_samples) for label in df[self.class_column].unique()]
         df = pd.concat(samples_by_class)
         df = df.sample(frac=1)
         df = df.reset_index(drop=True)

@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     preprocessor = Preprocessor(text_column=text_column, class_column=class_column)
     df = preprocessor.remove_duplicated(df=df)
-    df = preprocessor.remove_outliers(df=df, column=text_column)
+    df = preprocessor.remove_outliers(df=df)
 
     transformer = Transformer(text_column=text_column, class_column=class_column)
     df = transformer.to_lowercase(df=df)
@@ -54,9 +54,10 @@ if __name__ == "__main__":
         optimizer="adam",
         metrics=["accuracy"]
     )
-    model.fit(X_train, y_train, epochs=3, batch_size=32)
+    model.fit(X_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE)
 
     evaluator = Evaluator(X_test=X_test, y_test=y_test)
     y_pred = evaluator.predict(model=model, batch_size=BATCH_SIZE)
     df_cm = evaluator.generate_confusion_matrix(y_pred=y_pred, labels=labels)
-    report = evaluator.generate_report(labels=labels)
+    report = evaluator.generate_report(labels=labels, df_cm=df_cm)
+    print(report)

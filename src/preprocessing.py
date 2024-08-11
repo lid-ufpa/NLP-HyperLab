@@ -16,21 +16,21 @@ class Preprocessor:
             return True
         return False
 
-    def remove_outliers(self, df: pd.DataFrame, column: str):
+    def remove_outliers(self, df: pd.DataFrame):
 
-        df[f"len{column}"] = df[column].str.len()
+        df[f"len{self.text_column}"] = df[self.text_column].str.len()
 
-        quantiles = statistics.quantiles(df[column])
+        quantiles = statistics.quantiles(df[f"len{self.text_column}"])
 
         amplitude = quantiles[2] - quantiles[0]
 
-        df[f"outlier_{column}"] = df[column].map(lambda x: self.check_outlier(
+        df[f"outlier_{self.text_column}"] = df[f"len{self.text_column}"].map(lambda x: self.check_outlier(
             value=x,
             quantiles=quantiles,
             amplitude=amplitude
         ))
 
-        df = df.loc[~(df[f"outlier_{column}"])]
-        df = df.drop(columns=[f"len{column}", f"outlier_{column}"])
+        df = df.loc[~(df[f"outlier_{self.text_column}"])]
+        df = df.drop(columns=[f"len{self.text_column}", f"outlier_{self.text_column}"])
 
         return df
