@@ -1,4 +1,4 @@
-# EN05187 - NLP laboratory
+# NLP - HyperLab
 
 ## Description
 
