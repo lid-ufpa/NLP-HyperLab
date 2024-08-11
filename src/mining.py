@@ -14,7 +14,7 @@ from tensorflow.keras.layers import (
     Flatten
 )
 
-class Modeling:
+class Miner:
     def __init__(self, X: np.ndarray, y: np.ndarray):
         self.X = X
         self.y = y

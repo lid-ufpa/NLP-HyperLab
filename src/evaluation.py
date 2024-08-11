@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import numpy as np
 import pandas as pd
@@ -27,20 +27,20 @@ class Evaluator:
 
         return pd.DataFrame(cm, index=labels, columns=labels)
     
-    def get_binary_cms(self) -> Dict[str, pd.DataFrame]:
+    def get_binary_cms(self, labels: List[str], df_cm: pd.DataFrame) -> Dict[str, pd.DataFrame]:
         """Given n labels, generates n 2x2 matrices describing TP, TN, FP, FN of a multiclass confusion matrix."""
 
         binary_cms = {}
 
-        for label in self.labels:
+        for label in labels:
             # getting the index of label in evaluation list of labels
-            i = self.labels.index(label)
+            i = labels.index(label)
 
             # calculating metrics
-            TP = self.cm.iloc[i, i]
-            FP = self.cm.iloc[:, i].sum().sum() - TP
-            FN = self.cm.iloc[i, :].sum().sum() - TP
-            TN = self.cm.sum().sum() - TP - FP - FN
+            TP = df_cm.iloc[i, i]
+            FP = df_cm.iloc[:, i].sum().sum() - TP
+            FN = df_cm.iloc[i, :].sum().sum() - TP
+            TN = df_cm.sum().sum() - TP - FP - FN
 
             # construct DataFrame for current label
             binary_cms[label] = pd.DataFrame(
@@ -53,7 +53,7 @@ class Evaluator:
 
         return binary_cms
     
-    def report(self, label: str) -> dict:
+    def compute_metrics(self, label: str, binary_cm: pd.DataFrame) -> Dict[str, Union[int, float]]:
         """
         Returns evaluation metrics for a given label.\n\n
         P: Positives;\n
@@ -70,8 +70,6 @@ class Evaluator:
         BA: Balanced Accuracy;\n
         F1: F1 Score.
         """
-
-        binary_cm: pd.DataFrame = self.binary_cms[label]
 
         P: int = binary_cm.loc["ACTUAL POSITIVE"].sum()
         N: int = binary_cm.loc["ACTUAL NEGATIVE"].sum()
@@ -95,16 +93,16 @@ class Evaluator:
             "TP": TP, "FN": FN, "FP": FP, "TN": TN,
             "TPR": TPR, "TNR": TNR,
             "PPV": PPV, "NPV": NPV,
-            "FNR": FNR, "FPR": FPR,
-            "FDR": FDR, "FOR": FOR,
-            "PLR": PLR, "NLR": NLR,
-            "PT": PT, "TS": TS,
-            "PRE": PRE, "ACC": ACC,
-            "BA": BA, "F1": F1
+            "ACC": ACC, "BA": BA, "F1": F1
         }
 
-    def generate_report(self) -> pd.DataFrame:
+    def generate_report(self, labels: List[str], df_cm: pd.DataFrame) -> pd.DataFrame:
         """Generate complete evaluation report."""
+
+        binary_cms: Dict[str, pd.DataFrame] = self.get_binary_cms(
+            labels=labels,
+            df_cm=df_cm
+        )
 
         metrics: list = [
             "P",
@@ -122,15 +120,16 @@ class Evaluator:
             "F1",
         ]
 
-        reports: dict = {}
+        reports: Dict[str, Union[int, float]] = {}
 
-        for i in range(len(self.labels)):
-            label: str = self.labels[i]
-            reports[label]: dict = self.extract_metrics(label)
+        for label in labels:
+            binary_cm = binary_cms[label]
+            reports[label] = self.compute_metrics(label, binary_cm)
 
-        general_report: dict = {"label": self.labels}
+        general_report: Dict = {"label": labels}
 
         for metric in metrics:
-            general_report[metric]: list = [reports[label][metric] for label in reports.keys()]
+            general_report[metric] = [reports[label][metric] for label in reports.keys()]
 
         return pd.DataFrame(general_report).fillna(0)
+    

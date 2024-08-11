@@ -2,7 +2,7 @@ import statistics
 
 import pandas as pd
 
-class Preprocessing:
+class Preprocessor:
     def __init__(self, text_column: str, class_column: str) -> None:
         self.text_column = text_column
         self.class_column = class_column

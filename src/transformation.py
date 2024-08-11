@@ -7,13 +7,13 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 
-class Transformation:
+class Transformer:
     def __init__(self, text_column: str, class_column: str) -> None:
         self.text_column = text_column
         self.class_column = class_column
     
     def to_lowercase(self, df: pd.DataFrame) -> pd.DataFrame:
-        df["text"] = df["text"].str.lower()
+        df[self.text_column] = df[self.text_column].str.lower()
         return df
     
     def balance_class_amount(self, num_samples: int, df: pd.DataFrame) -> pd.DataFrame:
