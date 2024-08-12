@@ -39,7 +39,6 @@ class Miner:
         embedding: Embedding = Embedding(
             input_dim=vocab_length,
             output_dim=embedding_dim,
-            input_length=input_length
         )
 
         x = embedding(_input)
