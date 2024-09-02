@@ -6,6 +6,7 @@ from src.evaluation import Evaluator
 
 def lambda_handler(event, context):
 
+    print("Iniciando execução da função - evento:", event)
     NUM_SAMPLES = event["NUM_SAMPLES"]
     MAX_LEN = event["MAX_LEN"]
     TEST_SIZE = event["TEST_SIZE"]
